@@ -131,12 +131,15 @@ function dodge(e){
 no.addEventListener('click', e => e.preventDefault()); // "No" can never be chosen
 
 /* Email notifications (Web3Forms) */
-function notify(subject, message){
+function notify(subject, message, fields){
   if (!WEB3_KEY || WEB3_KEY.startsWith('PASTE')) return;
   fetch('https://api.web3forms.com/submit', {
     method: 'POST',
     headers: {'Content-Type':'application/json', 'Accept':'application/json'},
-    body: JSON.stringify({access_key: WEB3_KEY, subject: subject, from_name: 'Date proposal page', message: message})
+    body: JSON.stringify(Object.assign(
+      {access_key: WEB3_KEY, subject: subject, from_name: 'Date proposal page', message: message},
+      fields || {}
+    ))
   }).catch(() => {});
 }
 notify('She opened the page 👀', 'She just opened your date proposal page.');
@@ -144,7 +147,8 @@ notify('She opened the page 👀', 'She just opened your date proposal page.');
 /* Yes */
 yes.addEventListener('click', () => {
   no.style.display = 'none'; show('s2'); burst();
-  notify('She said YES 💖', 'She clicked Yes after trying to press No ' + dodges + ' time(s).');
+  notify('She said YES 💖', 'She clicked Yes after trying to press No ' + dodges + ' time(s).',
+    {Answer: 'Yes', 'No attempts': String(dodges)});
 });
 document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
 
@@ -176,7 +180,8 @@ $('foodNext').addEventListener('click', () => {
   $('summary').textContent = choice.day + ' at ' + choice.time + ' · ' + choice.food;
   $('ps').textContent = CONFIG.ps;
   show('s5'); burst();
-  notify('Date is set 🎉', 'Day: ' + choice.day + '\nTime: ' + choice.time + '\nFood: ' + choice.food);
+  notify('Date is set 🎉', 'Day: ' + choice.day + '\nTime: ' + choice.time + '\nFood: ' + choice.food,
+    {Day: choice.day, Time: choice.time, Food: choice.food, Answer: 'Yes'});
 });
 
 /* Confetti */
